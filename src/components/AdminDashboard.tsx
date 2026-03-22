@@ -112,14 +112,19 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
     onBack();
   };
 
-  const generateInvoice = (order: any) => {
+  const generateInvoice = (order: any, type: 'invoice' | 'receipt' = 'invoice') => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
+
+    const titleText = type === 'receipt' ? 'RECEIPT' : 'INVOICE';
+    const subtitleText = type === 'receipt' ? 'Payment Receipt' : 'Official Invoice';
+    const buttonText = type === 'receipt' ? '🖨️ Print Receipt' : '🖨️ Print Invoice';
+    const statusText = type === 'receipt' ? 'PAID' : order.status.toUpperCase();
 
     const html = `
       <html>
         <head>
-          <title>Invoice - Order #${order.id.slice(-8)}</title>
+          <title>${titleText} - Order #${order.id.slice(-8)}</title>
           <style>
             :root {
               --primary: #78350f;
@@ -272,17 +277,17 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
           </style>
         </head>
         <body>
-          <button class="print-btn no-print" onclick="window.print()">🖨️ Print Invoice</button>
+          <button class="print-btn no-print" onclick="window.print()">${buttonText}</button>
           
           <div class="header">
             <div>
               <h1 class="company-name">Premier Firewood Co.</h1>
-              <div class="invoice-title">Official Invoice</div>
+              <div class="invoice-title">${subtitleText}</div>
             </div>
             <div class="order-info">
               <p><strong>Order #:</strong> ${order.id.slice(-8).toUpperCase()}</p>
               <p><strong>Date:</strong> ${new Date(order.createdAt?.toDate()).toLocaleDateString()}</p>
-              <p><strong>Status:</strong> ${order.status.toUpperCase()}</p>
+              <p><strong>Status:</strong> ${statusText}</p>
             </div>
           </div>
 
@@ -332,6 +337,14 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
                 <strong>Account Number/Handle:</strong> [Enter Account Number/Handle]<br/>
                 <strong>Email:</strong> [Enter Email]<br/>
                 <strong>Phone:</strong> [Enter Phone]
+              </div>
+
+              <div style="margin-top: 24px;">
+                <div class="section-title">Payment Instructions</div>
+                <div class="no-print editable-label">Click below to edit instructions before printing:</div>
+                <div class="editable" contenteditable="true" style="font-style: italic; color: var(--text-muted);">
+                  Send payment to this CashApp tag: <strong>$YourCashAppTag</strong> and contact support with a screenshot of payment.
+                </div>
               </div>
               
               ${order.deliveryInfo?.notes ? `
@@ -443,13 +456,22 @@ export default function AdminDashboard({ onBack }: { onBack: () => void }) {
           </div>
         </div>
         <div className="flex items-center gap-6">
-          <button
-            onClick={() => generateInvoice(order)}
-            className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors"
-          >
-            <FileText size={16} />
-            Invoice
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => generateInvoice(order, 'invoice')}
+              className="flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors"
+            >
+              <FileText size={16} />
+              Invoice
+            </button>
+            <button
+              onClick={() => generateInvoice(order, 'receipt')}
+              className="flex items-center gap-2 px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors"
+            >
+              <CheckCircle2 size={16} />
+              Receipt
+            </button>
+          </div>
           <div className="text-right">
             <p className="text-stone-500 text-sm mb-1">Total Amount</p>
             <p className="text-4xl font-serif font-bold text-amber-900">${order.total?.toFixed(2)}</p>
