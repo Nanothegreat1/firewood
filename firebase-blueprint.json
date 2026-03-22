@@ -1,0 +1,75 @@
+{
+  "entities": {
+    "Category": {
+      "title": "Category",
+      "description": "Firewood categories (e.g., Hardwood, Softwood)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Category name" },
+        "description": { "type": "string", "description": "Category description" },
+        "icon": { "type": "string", "description": "Lucide icon name" }
+      },
+      "required": ["name"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Firewood products for sale",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Product name" },
+        "price": { "type": "number", "description": "Price in USD" },
+        "description": { "type": "string", "description": "Product description" },
+        "image": { "type": "string", "description": "Image URL" },
+        "categoryId": { "type": "string", "description": "Reference to Category ID" },
+        "stockStatus": { "type": "string", "enum": ["in-stock", "low-stock", "out-of-stock"], "description": "Availability" }
+      },
+      "required": ["name", "price", "categoryId"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User profiles and roles",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "User email" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "role": { "type": "string", "enum": ["admin", "customer"], "description": "User role" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account creation date" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer orders",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Reference to User UID" },
+        "items": { "type": "array", "items": { "type": "object" }, "description": "List of items in order" },
+        "total": { "type": "number", "description": "Total order amount" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "delivered", "cancelled"], "description": "Order status" },
+        "paymentMethod": { "type": "string", "description": "Selected payment method" },
+        "deliveryInfo": { "type": "object", "description": "Customer address and delivery type" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Order placement date" }
+      },
+      "required": ["userId", "items", "total", "status", "createdAt"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Site-wide configuration",
+      "type": "object",
+      "properties": {
+        "deliveryRates": { "type": "object", "description": "Delivery fee configuration" },
+        "contactEmail": { "type": "string", "description": "Business contact email" },
+        "contactPhone": { "type": "string", "description": "Business contact phone" },
+        "address": { "type": "string", "description": "Business physical address" }
+      }
+    }
+  },
+  "firestore": {
+    "/categories": { "schema": "Category", "description": "Firewood categories" },
+    "/products": { "schema": "Product", "description": "Firewood products" },
+    "/users": { "schema": "User", "description": "User profiles" },
+    "/orders": { "schema": "Order", "description": "Customer orders" },
+    "/settings": { "schema": "Settings", "description": "Site-wide settings" }
+  }
+}
